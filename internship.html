@@ -16,6 +16,158 @@
 		href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
 		rel="stylesheet">
 
+	<style>
+        :root {
+            /* Adjusted for square images - fits well on most screens */
+            --book-size: 575px; 
+            --speed: 0.8s;
+        }
+
+        /* Responsive scaling for smaller screens */
+        @media (max-width: 600px) {
+            :root { --book-size: 320px; }
+            .page-header h1 {
+                font-size: 1.8em !important;
+                margin-bottom: 10px;
+                padding: 0 10px;
+            }
+            .page-header {
+                padding: 60px 0 40px !important;
+            }
+        }
+
+        .flip-book-wrapper {
+            padding: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: auto;
+            position: relative;
+        }
+
+        /* Book Container */
+        .book-container {
+            position: relative;
+            width: var(--book-size);
+            height: var(--book-size);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            perspective: 2000px;
+            margin: 0 auto;
+        }
+
+        .book {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        /* Individual Page Logic */
+        .page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform var(--speed) cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            backface-visibility: hidden;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .back {
+            transform: rotateY(180deg);
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures your 3508px images fill the square perfectly */
+        }
+
+        /* Hardcover Look for 1.jpg and 22.jpg */
+        .is-cover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #222; 
+        }
+
+        /* Flipped State */
+        .flipped {
+            transform: rotateY(-180deg);
+        }
+
+        /* Navigation Arrows */
+        .nav-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: calc(var(--book-size) * 2.3);
+            margin-left: calc(var(--book-size) * -1.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transform: translateY(-50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .arrow-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            pointer-events: auto;
+            flex-shrink: 0;
+            flex-grow: 0;
+            padding: 0;
+        }
+
+        .arrow-btn:hover {
+            background: #fff;
+            transform: scale(1.1);
+        }
+
+        .arrow-btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        /* Shadow Effect on Spine */
+        .page::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);
+            z-index: 5;
+        }
+	</style>
 </head>
 
 <body>
@@ -38,21 +190,31 @@
 
 	<section class="bg-grey padding-large" style="padding-top: 40px;">
 		<div class="container">
-
 			<div class="row">
 				<div class="col-md-12">
 					<div class="description text-lead">
-						<p align=justify>The projects include working drawings, rendering, and interior design of a salon, commercial and residential buildings, a cafe, and a health center. Each project involved comprehensive architectural design, space planning, material selection, and the creation of detailed working drawings and 3D visualizations to bring the concepts to life.</p>
+						<p align="justify">The projects include working drawings, rendering, and interior design of a salon, commercial and residential buildings, a cafe, and a health center. Each project involved comprehensive architectural design, space planning, material selection, and the creation of detailed working drawings and 3D visualizations to bring the concepts to life.</p>
 					</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="col-md-12">
-					<div class="pdf-viewer-container">
-						<embed src="portfolio/internship.pdf" type="application/pdf" width="100%" height="600" />
+					<div class="flip-book-wrapper">
+						<div class="book-container" id="container">
+							<div class="book" id="book">
+							</div>
+						</div>
+						<div class="nav-container">
+							<button class="arrow-btn" id="prevBtn" disabled>&#10094;</button>
+							<button class="arrow-btn" id="nextBtn">&#10095;</button>
+						</div>
 					</div>
 				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12"></div>
 			</div>
 		</div>
 	</section>
@@ -68,6 +230,13 @@
 			</div>
 		</div>
 	</div>
+<script>
+    window.flipBookConfig = {
+        totalImages: 22,
+        imagePath: 'portfolio/images/internship'
+    };
+</script>
+<script src="js/flip-book.js"></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
