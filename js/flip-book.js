@@ -38,18 +38,25 @@ for (let i = 1; i <= totalSheets; i++) {
 }
 
 function updateNav() {
-    // Shift book position to keep it centered when open
+    const isMobile = window.innerWidth <= 600;
+
     if (currentSheet === 1) {
-        container.style.transform = "translateX(0%)";
+        // First page (Top)
+        container.style.transform = isMobile ? "translateY(0%)" : "translateX(0%)";
     } else if (currentSheet > totalSheets) {
-        container.style.transform = "translateX(100%)";
+        // Last page (Bottom)
+        container.style.transform = isMobile ? "translateY(100%)" : "translateX(100%)";
     } else {
-        container.style.transform = "translateX(50%)";
+        // Open Book (Centered)
+        container.style.transform = isMobile ? "translateY(50%)" : "translateX(50%)";
     }
 
     prevBtn.disabled = (currentSheet === 1);
     nextBtn.disabled = (currentSheet > totalSheets);
 }
+
+// Ensure the layout recalculates if the screen is resized
+window.addEventListener('resize', updateNav);
 
 function goNext() {
     if (currentSheet <= totalSheets) {

@@ -19,7 +19,7 @@
 	<style>
         :root {
             /* Adjusted for square images - fits well on most screens */
-            --book-size: 600px; 
+            --book-size: 570px; 
             --speed: 0.8s;
         }
 
@@ -128,15 +128,15 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid white;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 24px;
             font-weight: bold;
-            color: #333;
+            color: white;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             pointer-events: auto;
@@ -146,7 +146,7 @@
         }
 
         .arrow-btn:hover {
-            background: #fff;
+            background: rgba(0, 0, 0, 0.8);
             transform: scale(1.1);
         }
 
@@ -167,6 +167,251 @@
             background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);
             z-index: 5;
         }
+
+        /* Fullscreen Modal */
+        .fullscreen-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .fullscreen-modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fullscreen-container {
+            position: relative;
+            width: 95vw;
+            height: 95vh;
+            max-width: 1800px;
+            max-height: 1200px;
+            display: flex;
+            gap: 0;
+            align-items: stretch;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .fullscreen-page {
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        .fullscreen-page#fullscreenPageRight::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 10px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);
+            z-index: 10;
+        }
+
+        .fullscreen-page img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            animation: slideIn 0.3s ease-in-out;
+            display: block;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .fullscreen-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid white;
+            border-radius: 50%;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            z-index: 10000;
+        }
+
+        .fullscreen-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        .page img {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .page img:hover {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .fullscreen-container {
+                flex-direction: column;
+                gap: 0;
+                width: 100vw;
+                height: 100vh;
+                max-width: 100%;
+                max-height: 100%;
+            }
+
+            .fullscreen-page {
+                width: 100%;
+                height: 50%;
+            }
+
+            .fullscreen-page#fullscreenPageRight::before {
+                width: 100%;
+                height: 10px;
+                top: 0;
+                left: 0;
+                background: linear-gradient(to bottom, rgba(0,0,0,0.2), transparent);
+            }
+
+            .fullscreen-close {
+                top: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 24px;
+            }
+        }
+    @media (max-width: 600px) {
+        :root { 
+            --book-size: 300px; /* Slightly smaller to ensure fit on most phones */
+        }
+
+        .flip-book-wrapper {
+            /* High vertical padding ensures pages don't hit the text above or below */
+            padding: 250px 0 !important; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .book-container {
+            margin: 0 auto;
+            /* Ensure the container itself doesn't clip the flipping page */
+            overflow: visible; 
+        }
+
+        .page {
+            transform-origin: top center;
+        }
+
+        .flipped {
+            transform: rotateX(-180deg) !important;
+        }
+
+        .back {
+            transform: rotateX(180deg);
+        }
+
+        /* Navigation Container: Expanded to keep buttons far away */
+        .nav-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            left: 0;
+            top: 50%;
+            width: 100%;
+            /* 2.5x book size creates a large 'buffer' zone for the buttons */
+            height: calc(var(--book-size) * 2.5); 
+            margin-left: 0;
+            transform: translateY(-50%);
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        .arrow-btn {
+            pointer-events: auto;
+            margin: 0 auto;
+            /* Pointing Up and Down */
+            transform: rotate(90deg);
+            background: rgba(0, 0, 0, 0.8); /* Darker for better visibility */
+        }
+
+        .nav-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: calc(var(--book-size) * 2.6); /* Increased height to keep buttons far away */
+            margin-left: 0;
+            transform: translateY(-50%);
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        .arrow-btn {
+            pointer-events: auto;
+            margin: 0 auto;
+            /* Force the rotation and prevent it from being overridden */
+            transform: rotate(90deg) !important; 
+        }
+
+        /* Maintain rotation during hover while allowing the scale effect */
+        .arrow-btn:hover {
+            transform: rotate(90deg) scale(1.1) !important;
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        /* Maintain rotation when disabled */
+        .arrow-btn:disabled {
+            transform: rotate(90deg) !important;
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+    }
 	</style>
 </head>
 
@@ -230,6 +475,19 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Fullscreen Modal -->
+	<div class="fullscreen-modal" id="fullscreenModal">
+		<div class="fullscreen-close" id="closeFullscreen">&times;</div>
+		<div class="fullscreen-container">
+			<div class="fullscreen-page" id="fullscreenPageLeft">
+				<img id="fullscreenImageLeft" src="" alt="Page Left">
+			</div>
+			<div class="fullscreen-page" id="fullscreenPageRight">
+				<img id="fullscreenImageRight" src="" alt="Page Right">
+			</div>
+		</div>
+	</div>
 <script>
     window.flipBookConfig = {
         totalImages: 22,
@@ -237,6 +495,132 @@
     };
 </script>
 <script src="js/flip-book.js"></script>
+
+<script>
+    // Fullscreen Modal Functionality
+    const fullscreenModal = document.getElementById('fullscreenModal');
+    const closeFullscreen = document.getElementById('closeFullscreen');
+    const fullscreenImageLeft = document.getElementById('fullscreenImageLeft');
+    const fullscreenImageRight = document.getElementById('fullscreenImageRight');
+    const fullscreenPageRight = document.getElementById('fullscreenPageRight');
+    const fullscreenPageLeft = document.getElementById('fullscreenPageLeft');
+
+    // Wait for flip-book to load, then add click handlers to images
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            addImageClickHandlers();
+        }, 100);
+    });
+
+    function addImageClickHandlers() {
+        const pages = document.querySelectorAll('.page');
+        pages.forEach((page, index) => {
+            const frontImg = page.querySelector('.front img');
+            const backImg = page.querySelector('.back img');
+
+            frontImg.addEventListener('click', function() {
+                const imageSrc = frontImg.src;
+                const imageNum = parseInt(imageSrc.match(/\/(\d+)\.jpg/)[1]);
+                const config = window.flipBookConfig;
+                
+                let leftSrc, rightSrc;
+                
+                if (imageNum === 1) {
+                    // Page 1: show pages 1 and 2
+                    leftSrc = frontImg.src;
+                    rightSrc = backImg.src;
+                } else if (imageNum === config.totalImages) {
+                    // Last page: show pages N-1 and N
+                    leftSrc = frontImg.src;
+                    rightSrc = backImg.src;
+                } else if (imageNum % 2 === 0) {
+                    // Even page: show that page and next page
+                    leftSrc = frontImg.src;
+                    const nextPageNum = imageNum + 1;
+                    const nextImagePath = imageSrc.replace(/\/\d+\.jpg/, `/${nextPageNum}.jpg`);
+                    rightSrc = nextImagePath;
+                } else {
+                    // Odd page (not 1): show previous page and that page
+                    const prevPageNum = imageNum - 1;
+                    const prevImagePath = imageSrc.replace(/\/\d+\.jpg/, `/${prevPageNum}.jpg`);
+                    leftSrc = prevImagePath;
+                    rightSrc = frontImg.src;
+                }
+                
+                openFullscreen(leftSrc, rightSrc);
+            });
+
+            backImg.addEventListener('click', function() {
+                const imageSrc = backImg.src;
+                const imageNum = parseInt(imageSrc.match(/\/(\d+)\.jpg/)[1]);
+                const config = window.flipBookConfig;
+                
+                let leftSrc, rightSrc;
+                
+                if (imageNum === 1) {
+                    // Page 1: show pages 1 and 2
+                    leftSrc = frontImg.src;
+                    rightSrc = backImg.src;
+                } else if (imageNum === config.totalImages) {
+                    // Last page: show pages N-1 and N
+                    leftSrc = frontImg.src;
+                    rightSrc = backImg.src;
+                } else if (imageNum % 2 === 0) {
+                    // Even page: show that page and next page
+                    leftSrc = backImg.src;
+                    const nextPageNum = imageNum + 1;
+                    const nextImagePath = imageSrc.replace(/\/\d+\.jpg/, `/${nextPageNum}.jpg`);
+                    rightSrc = nextImagePath;
+                } else {
+                    // Odd page (not 1): show previous page and that page
+                    const prevPageNum = imageNum - 1;
+                    const prevImagePath = imageSrc.replace(/\/\d+\.jpg/, `/${prevPageNum}.jpg`);
+                    leftSrc = prevImagePath;
+                    rightSrc = backImg.src;
+                }
+                
+                openFullscreen(leftSrc, rightSrc);
+            });
+        });
+    }
+
+    function openFullscreen(leftImageSrc, rightImageSrc) {
+        // For all pages, show both pages side by side
+        fullscreenPageLeft.style.width = 'auto';
+        fullscreenPageRight.style.display = 'flex';
+        fullscreenImageLeft.src = leftImageSrc;
+        fullscreenImageRight.src = rightImageSrc;
+        fullscreenModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeFullscreenModal() {
+        fullscreenModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close button click
+    closeFullscreen.addEventListener('click', closeFullscreenModal);
+
+    // Close on background click
+    fullscreenModal.addEventListener('click', function(e) {
+        if (e.target === fullscreenModal) {
+            closeFullscreenModal();
+        }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && fullscreenModal.classList.contains('active')) {
+            closeFullscreenModal();
+        }
+    });
+
+    // Prevent closing on content click
+    document.querySelector('.fullscreen-container').addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+</script>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"

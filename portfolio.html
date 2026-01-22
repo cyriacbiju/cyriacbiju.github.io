@@ -19,21 +19,8 @@
 	<style>
         :root {
             /* Adjusted for square images - fits well on most screens */
-            --book-size: 600px; 
+            --book-size: 570px; 
             --speed: 0.8s;
-        }
-
-        /* Responsive scaling for smaller screens */
-        @media (max-width: 600px) {
-            :root { --book-size: 320px; }
-            .page-header h1 {
-                font-size: 1.8em !important;
-                margin-bottom: 10px;
-                padding: 0 10px;
-            }
-            .page-header {
-                padding: 60px 0 40px !important;
-            }
         }
 
         .flip-book-wrapper {
@@ -95,16 +82,22 @@
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ensures your 3508px images fill the square perfectly */
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
 
-        /* Hardcover Look for 1.jpg and 22.jpg */
+        .page img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Hardcover Look for first and last images */
         .is-cover {
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             background: #222; 
         }
 
-        /* Flipped State */
+        /* Horizontal Flipped State */
         .flipped {
             transform: rotateY(-180deg);
         }
@@ -128,15 +121,15 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid white;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 24px;
             font-weight: bold;
-            color: #333;
+            color: white;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             pointer-events: auto;
@@ -146,7 +139,7 @@
         }
 
         .arrow-btn:hover {
-            background: #fff;
+            background: rgba(0, 0, 0, 0.8);
             transform: scale(1.1);
         }
 
@@ -167,6 +160,151 @@
             background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);
             z-index: 5;
         }
+
+        /* Fullscreen Modal */
+        .fullscreen-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .fullscreen-modal.active { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .fullscreen-container {
+            position: relative;
+            width: 95vw;
+            height: 95vh;
+            max-width: 1800px;
+            max-height: 1200px;
+            display: flex;
+            gap: 0;
+            align-items: stretch;
+            justify-content: center;
+        }
+
+        .fullscreen-page {
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .fullscreen-page#fullscreenPageRight::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 10px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);
+            z-index: 10;
+        }
+
+        .fullscreen-page img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .fullscreen-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid white;
+            border-radius: 50%;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+    @media (max-width: 600px) {
+        :root { 
+            --book-size: 300px; 
+        }
+
+        .flip-book-wrapper {
+            padding: 250px 0 !important; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .page { transform-origin: top center; }
+        .flipped { transform: rotateX(-180deg) !important; }
+        .back { transform: rotateX(180deg); }
+
+        /* Navigation Container: Fixed centering and spacing */
+        .nav-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            left: 0;
+            right: 0; /* Ensures full-width centering */
+            width: 100%;
+            top: 50%;
+            height: calc(var(--book-size) * 2.6); 
+            transform: translateY(-50%);
+            pointer-events: none;
+            z-index: 2000;
+            margin-left: 0; /* Reset desktop margin */
+        }
+
+        .arrow-btn {
+            pointer-events: auto;
+            margin: 0 auto; /* Horizontally centers buttons in the 100% width container */
+            transform: rotate(90deg) !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            width: 50px;
+            height: 50px;
+            display: flex !important;
+        }
+
+        .arrow-btn:hover { transform: rotate(90deg) scale(1.1) !important; }
+        .arrow-btn:disabled { transform: rotate(90deg) !important; opacity: 0.2; }
+
+        /* --- FULLSCREEN MOBILE FIX --- */
+        .fullscreen-container {
+            flex-direction: column; /* Stacks images top to bottom */
+        }
+
+        .fullscreen-page {
+            width: 100%;
+            height: 50%; /* Each page takes half the vertical screen */
+        }
+
+        .fullscreen-page#fullscreenPageRight::before {
+            /* Adjust shadow for vertical spine */
+            width: 100%;
+            height: 10px;
+            top: 0;
+            left: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), transparent);
+        }
+    }
 	</style>
 </head>
 
@@ -194,8 +332,10 @@
 				<div class="col-md-12">
 					<div class="description text-lead">
 						<p align="justify">
-                            This portfolio presents a selected body of work that reflects my academic training and professional experience in architecture. It showcases a range of projects developed across different scales and contexts, exploring design thinking from concept to execution.
-                            The academic projects highlight my approach to research-driven design, spatial exploration, and critical engagement with architectural theory. The professional work demonstrates practical experience, including real-world constraints, collaboration, technical development, and execution.
+                            This portfolio presents a selected body of work that reflects my academic training and professional experience in architecture. 
+                            It showcases a range of projects developed across different scales and contexts, exploring design thinking from concept to execution. 
+                            The academic projects highlight my approach to research-driven design, spatial exploration, and critical engagement with architectural theory. 
+                            The professional work demonstrates practical experience, including real-world constraints, collaboration, technical development, and execution. 
                             Together, these projects represent my evolving design philosophy, technical skills, and commitment to creating thoughtful, responsive, and contextually grounded architecture.</p>
 					</div>
 				</div>
@@ -215,24 +355,21 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="row">
-				<div class="col-md-12"></div>
-			</div>
 		</div>
 	</section>
 
-	<div id="footer-bottom">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12 text-center">
-					<div class="copyright" style="font-size: 12px !important;">
-						<p>© All rights reserved.</p>
-					</div>
-				</div>
+	<div class="fullscreen-modal" id="fullscreenModal">
+		<div class="fullscreen-close" id="closeFullscreen">&times;</div>
+		<div class="fullscreen-container">
+			<div class="fullscreen-page" id="fullscreenPageLeft">
+				<img id="fullscreenImageLeft" src="" alt="Page Left">
+			</div>
+			<div class="fullscreen-page" id="fullscreenPageRight">
+				<img id="fullscreenImageRight" src="" alt="Page Right">
 			</div>
 		</div>
 	</div>
+
 <script>
     window.flipBookConfig = {
         totalImages: 46,
@@ -241,11 +378,56 @@
 </script>
 <script src="js/flip-book.js"></script>
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
-		crossorigin="anonymous"></script>
-	<script src="js/script.js"></script>
+<script>
+    const modal = document.getElementById('fullscreenModal');
+    const imgLeft = document.getElementById('fullscreenImageLeft');
+    const imgRight = document.getElementById('fullscreenImageRight');
+
+    function openFullscreen(leftSrc, rightSrc) {
+        imgLeft.src = leftSrc;
+        imgRight.src = rightSrc;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    document.getElementById('closeFullscreen').onclick = () => {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    };
+
+    // Initialize Click Handlers for Fullscreen View
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            document.querySelectorAll('.page img').forEach(img => {
+                img.onclick = function() {
+                    const currentNum = parseInt(this.src.match(/\/(\d+)\.jpg/)[1]);
+                    const path = window.flipBookConfig.imagePath;
+                    const total = window.flipBookConfig.totalImages;
+
+                    let left, right;
+                    if (currentNum === 1 || currentNum === total) {
+                        left = `${path}/${currentNum === 1 ? 1 : total - 1}.jpg`;
+                        right = `${path}/${currentNum === 1 ? 2 : total}.jpg`;
+                    } else if (currentNum % 2 === 0) {
+                        left = this.src;
+                        right = `${path}/${currentNum + 1}.jpg`;
+                    } else {
+                        left = `${path}/${currentNum - 1}.jpg`;
+                        right = this.src;
+                    }
+                    openFullscreen(left, right);
+                };
+            });
+        }, 500);
+    });
+
+    // Close on background click
+    modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+    crossorigin="anonymous"></script>
 
 </body>
-
 </html>
