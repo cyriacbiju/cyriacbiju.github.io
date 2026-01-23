@@ -305,6 +305,21 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.2), transparent);
         }
     }
+    .fullscreen-page img {
+        transition: opacity 0.2s ease-in-out;
+    }
+    .fullscreen-page {
+        cursor: pointer;
+    }
+
+    /* Optional: Add a subtle hover effect to indicate direction */
+    #fullscreenPageLeft:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    #fullscreenPageRight:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
 	</style>
 </head>
 
@@ -423,6 +438,82 @@
 
     // Close on background click
     modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+    // Keep track of which pages are currently visible in the modal
+    let currentModalLeftPage = 1;
+
+    function openFullscreen(leftImageSrc, rightImageSrc) {
+        // Extract the page number from the left image source to track state
+        const match = leftImageSrc.match(/\/(\d+)\.jpg/);
+        currentModalLeftPage = match ? parseInt(match[1]) : 1;
+
+        fullscreenPageLeft.style.width = 'auto';
+        fullscreenPageRight.style.display = 'flex';
+        updateModalImages(leftImageSrc, rightImageSrc);
+        
+        fullscreenModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Function to update images with a simple fade transition
+    function updateModalImages(leftSrc, rightSrc) {
+        [fullscreenImageLeft, fullscreenImageRight].forEach(img => {
+            img.style.opacity = '0';
+        });
+
+        setTimeout(() => {
+            fullscreenImageLeft.src = leftSrc;
+            fullscreenImageRight.src = rightSrc;
+            [fullscreenImageLeft, fullscreenImageRight].forEach(img => {
+                img.style.opacity = '1';
+            });
+        }, 150); // Short delay for the "fade out/in" effect
+    }
+
+    function navigateModal(direction) {
+        const config = window.flipBookConfig;
+        let nextLeft;
+
+        if (direction === 'next') {
+            nextLeft = currentModalLeftPage + 2;
+        } else {
+            nextLeft = currentModalLeftPage - 2;
+        }
+
+        // Boundary checks
+        if (nextLeft >= 1 && nextLeft < config.totalImages) {
+            currentModalLeftPage = nextLeft;
+            const basePath = config.imagePath;
+            updateModalImages(
+                `${basePath}/${currentModalLeftPage}.jpg`,
+                `${basePath}/${currentModalLeftPage + 1}.jpg`
+            );
+        }
+    }
+
+    // Updated Keyboard Listener
+    document.addEventListener('keydown', function(e) {
+        if (!fullscreenModal.classList.contains('active')) return;
+
+        if (e.key === 'Escape') {
+            closeFullscreenModal();
+        } else if (e.key === 'ArrowRight') {
+            navigateModal('next');
+        } else if (e.key === 'ArrowLeft') {
+            navigateModal('prev');
+        }
+    });
+    // Click left side of modal to go back
+    fullscreenPageLeft.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevents the modal from closing
+        navigateModal('prev');
+    });
+
+    // Click right side of modal to go forward
+    fullscreenPageRight.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevents the modal from closing
+        navigateModal('next');
+    });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"

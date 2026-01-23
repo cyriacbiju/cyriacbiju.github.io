@@ -85,11 +85,13 @@
   var initSlider = function() {
     // homepage slider | slick slider
     $('.main-slider').slick({
-        autoplay: false,
-        autoplaySpeed: 4000,
+        autoplay: true,
+        autoplaySpeed: 3000,
         fade: true,
         prevArrow: $('.prev'),
         nextArrow: $('.next'),
+        pauseOnHover: true,
+        pauseOnFocus: true,
     });
 
     $('.main-slider').on('beforeChange', function(event, slick, currentSlide, nextSlide){
